@@ -74,7 +74,7 @@ export default function OrderForm({ items, source, products, showOrderSummary = 
         notes: form.notes.trim(),
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         source,
-        captchaToken,
+        captchaToken: captchaToken || '',
       });
 
       const order = res.data.order;

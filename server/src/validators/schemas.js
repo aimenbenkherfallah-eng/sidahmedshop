@@ -27,7 +27,10 @@ const orderSchema = z.object({
     .max(20, 'Too many items'),
   source: z.enum(['express', 'checkout']).default('checkout'),
   notes: z.string().trim().max(500).optional().default(''),
-  captchaToken: z.string().optional().default(''),
+  captchaToken: z.preprocess(
+    (v) => (typeof v === 'string' ? v : ''),
+    z.string().max(4096).default('')
+  ),
 });
 
 const reviewSchema = z.object({

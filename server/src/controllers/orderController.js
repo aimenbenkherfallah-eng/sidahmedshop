@@ -2,6 +2,7 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const Settings = require('../models/Settings');
 const AppError = require('../utils/AppError');
+const { getProvince } = require('../config/constants');
 const { generateEventId } = require('../utils/hash');
 const { verifyTurnstile } = require('../services/turnstileService');
 const { sendMetaEvent } = require('../services/metaService');
@@ -72,6 +73,7 @@ const createOrder = async (req, res, next) => {
       customerName,
       phone,
       wilaya,
+      wilayaName: getProvince(wilaya)?.fr || String(wilaya),
       address,
       items: orderItems,
       subtotal,
