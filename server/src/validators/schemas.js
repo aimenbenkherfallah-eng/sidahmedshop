@@ -58,6 +58,8 @@ const adminProductSchema = z.object({
   stock: z.coerce.number().int().min(0).max(1e6),
   active: z.coerce.boolean().optional().default(true),
   imageUrls: z.string().optional().default(''),
+  landingEnabled: z.coerce.boolean().optional().default(false),
+  landingHtml: z.string().max(150000, 'Landing page HTML is too long (max 150KB)').optional().default(''),
 });
 
 const adminSettingsSchema = z.object({
@@ -81,6 +83,7 @@ const adminSettingsSchema = z.object({
   tiktokPixelId: z.string().max(64).trim().optional(),
   defaultShippingFee: z.coerce.number().min(0).max(50000).optional(),
   shippingFees: z.record(z.coerce.number().min(0).max(50000)).optional(),
+  landingPage: z.object({ enabled: z.boolean().optional() }).optional(),
 });
 
 module.exports = {

@@ -6,6 +6,7 @@ const getSettings = async (_req, res, next) => {
     const settings = await Settings.getSingleton();
     const doc = settings.toObject();
     if (doc.shippingFees) doc.shippingFees = Object.fromEntries(doc.shippingFees);
+    if (!doc.landingPage) doc.landingPage = { enabled: true };
     res.json({ success: true, settings: doc });
   } catch (err) {
     next(err);
@@ -33,11 +34,19 @@ const updateSettings = async (req, res, next) => {
     if (data.tiktokPixelId !== undefined) settings.tiktokPixelId = data.tiktokPixelId;
     if (data.defaultShippingFee !== undefined) settings.defaultShippingFee = data.defaultShippingFee;
     if (data.shippingFees) settings.shippingFees = data.shippingFees;
+    if (data.landingPage) {
+      settings.landingPage = {
+        enabled: data.landingPage.enabled !== undefined
+          ? data.landingPage.enabled
+          : settings.landingPage?.enabled ?? true,
+      };
+    }
 
     await settings.save();
 
     const doc = settings.toObject();
     if (doc.shippingFees) doc.shippingFees = Object.fromEntries(doc.shippingFees);
+    if (!doc.landingPage) doc.landingPage = { enabled: true };
     res.json({ success: true, settings: doc });
   } catch (err) {
     next(err);

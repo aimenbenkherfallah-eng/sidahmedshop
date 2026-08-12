@@ -66,6 +66,10 @@ const createProduct = async (req, res, next) => {
       stock: req.body.stock,
       active: req.body.active !== false,
       images,
+      landingPage: {
+        enabled: req.body.landingEnabled !== false,
+        html: req.body.landingHtml || '',
+      },
     });
 
     res.status(201).json({ success: true, product });
@@ -99,6 +103,10 @@ const updateProduct = async (req, res, next) => {
     product.stock = stock;
     product.active = active !== false;
     product.images = images;
+    product.landingPage = {
+      enabled: req.body.landingEnabled !== false,
+      html: req.body.landingHtml || '',
+    };
 
     await product.save();
     res.json({ success: true, product });

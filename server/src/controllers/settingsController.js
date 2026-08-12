@@ -12,6 +12,7 @@ const getPublicSettings = async (_req, res, next) => {
         metaPixelId: settings.metaPixelId,
         tiktokPixelId: settings.tiktokPixelId,
         defaultShippingFee: settings.defaultShippingFee,
+        landingPage: settings.landingPage || { enabled: true },
       },
     });
   } catch (err) {

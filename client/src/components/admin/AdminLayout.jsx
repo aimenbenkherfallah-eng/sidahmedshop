@@ -10,7 +10,7 @@ const navItems = [
 ];
 
 export default function AdminLayout() {
-  const { t } = useLanguage();
+  const { t, lang, toggleLang } = useLanguage();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -50,6 +50,13 @@ export default function AdminLayout() {
         </nav>
         <div className="border-t border-slate-100 p-2">
           <div className="hidden px-3 py-1 text-xs text-slate-400 lg:block">{user?.username}</div>
+          <button
+            onClick={toggleLang}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-primary-600 hover:bg-primary-50"
+          >
+            <span className="text-lg">🌐</span>
+            <span className="hidden lg:inline">{lang === 'ar' ? 'Français' : 'العربية'}</span>
+          </button>
           <button
             onClick={onLogout}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50"

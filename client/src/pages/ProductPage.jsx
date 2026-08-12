@@ -71,7 +71,7 @@ function MagnifierGallery({ images, title }) {
 export default function ProductPage() {
   const { slug } = useParams();
   const { t, lang } = useLanguage();
-  const { addToCart, showToast } = useStore();
+  const { addToCart, showToast, settings } = useStore();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -121,8 +121,25 @@ export default function ProductPage() {
 
   const orderItems = [{ productId: product._id, quantity }];
 
+  const showLanding =
+    product.landingPage?.enabled === true &&
+    settings?.landingPage?.enabled !== false &&
+    product.landingPage?.html?.trim().length > 0;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+      {showLanding && (
+        <section className="mb-10">
+          <iframe
+            title="landing-page"
+            sandbox="allow-scripts allow-forms allow-popups"
+            srcDoc={product.landingPage.html}
+            className="w-full rounded-2xl border border-slate-100 bg-white"
+            style={{ height: 850, border: 'none' }}
+          />
+        </section>
+      )}
+
       <div className="grid gap-8 lg:grid-cols-2">
         <MagnifierGallery images={product.images} title={displayTitle} />
 

@@ -15,6 +15,8 @@ const EMPTY = {
   description: '',
   descriptionAr: '',
   imageUrls: '',
+  landingEnabled: false,
+  landingHtml: '',
 };
 
 export default function ProductFormPage() {
@@ -46,6 +48,8 @@ export default function ProductFormPage() {
           description: p.description || '',
           descriptionAr: p.descriptionAr || '',
           imageUrls: (p.images || []).join('\n'),
+          landingEnabled: p.landingPage?.enabled ?? false,
+          landingHtml: p.landingPage?.html || '',
         });
       })
       .catch((err) => showToast(err.message, 'error'))
@@ -160,6 +164,33 @@ export default function ProductFormPage() {
           <p className="mt-1 text-xs text-slate-400">
             {form.active ? 'Les images uploadées remplacent les URLs.' : ''}
           </p>
+        </div>
+
+        <div className="rounded-xl border border-primary-100 bg-primary-50/40 p-5">
+          <h3 className="mb-3 font-extrabold text-slate-800">🚀 {t.admin.landingSection}</h3>
+          <label className="flex items-center gap-2 text-sm font-bold text-slate-700">
+            <input
+              type="checkbox"
+              checked={form.landingEnabled}
+              onChange={(e) => set('landingEnabled', e.target.checked)}
+              className="h-5 w-5 accent-primary-600"
+            />
+            {t.admin.landingEnabled}
+          </label>
+          {form.landingEnabled && (
+            <div className="mt-3">
+              <label className="label">{t.admin.landingHtml}</label>
+              <textarea
+                value={form.landingHtml}
+                onChange={(e) => set('landingHtml', e.target.value)}
+                rows={12}
+                className="input resize-y font-mono text-xs"
+                dir="ltr"
+                placeholder="<div style='text-align:center'><h1>Mon offre spéciale</h1>...</div>"
+              />
+              <p className="mt-1 text-xs text-slate-500">{t.admin.landingHint}</p>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">

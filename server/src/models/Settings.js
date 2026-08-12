@@ -28,6 +28,9 @@ const settingsSchema = new mongoose.Schema(
     },
     metaPixelId: { type: String, default: '', maxlength: 64, trim: true },
     tiktokPixelId: { type: String, default: '', maxlength: 64, trim: true },
+    landingPage: {
+      enabled: { type: Boolean, default: true },
+    },
     defaultShippingFee: { type: Number, default: 600, min: 0, max: 50000 },
     shippingFees: {
       type: Map,

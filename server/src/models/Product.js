@@ -54,6 +54,14 @@ const productSchema = new mongoose.Schema(
         message: 'Maximum 6 images per product',
       },
     },
+    landingPage: {
+      enabled: { type: Boolean, default: false },
+      html: {
+        type: String,
+        default: '',
+        maxlength: [150000, 'Landing page HTML is too long (max 150KB)'],
+      },
+    },
     stock: { type: Number, required: true, min: [0, 'Stock cannot be negative'], default: 0 },
     active: { type: Boolean, default: true, index: true },
     slug: { type: String, unique: true, index: true },
