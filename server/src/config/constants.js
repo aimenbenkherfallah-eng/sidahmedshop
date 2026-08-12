@@ -80,6 +80,7 @@ const ORDER_STATUS_LABELS = {
 const MAX_ORDER_ITEMS = 20;
 const MAX_REVIEW_PHOTOS = 4;
 const MAX_IMAGE_SIZE_MB = 5;
+const MAX_LANDING_IMAGE_SIZE_MB = 12;
 const MAX_IMAGES_PER_PRODUCT = 6;
 
 const getProvince = (code) => PROVINCES.find((p) => p.code === Number(code)) || null;
@@ -92,6 +93,7 @@ module.exports = {
   MAX_ORDER_ITEMS,
   MAX_REVIEW_PHOTOS,
   MAX_IMAGE_SIZE_MB,
+  MAX_LANDING_IMAGE_SIZE_MB,
   MAX_IMAGES_PER_PRODUCT,
   getProvince,
 };

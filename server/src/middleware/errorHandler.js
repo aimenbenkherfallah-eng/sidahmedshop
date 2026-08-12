@@ -29,7 +29,13 @@ const errorHandler = (err, _req, res, _next) => {
 
   if (err.name === 'MulterError') {
     statusCode = 400;
-    message = `Upload error: ${err.message}`;
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      message = 'Image trop lourde. Taille maximale : 12 Mo par fichier.';
+    } else if (err.code === 'LIMIT_FILE_COUNT') {
+      message = 'Trop de fichiers envoyés (max 7 : 6 images + 1 landing).';
+    } else {
+      message = `Upload error: ${err.message}`;
+    }
   }
 
   if (!err.isOperational) {

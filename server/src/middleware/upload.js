@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { MAX_IMAGE_SIZE_MB, MAX_IMAGES_PER_PRODUCT, MAX_REVIEW_PHOTOS } = require('../config/constants');
+const { MAX_IMAGE_SIZE_MB, MAX_LANDING_IMAGE_SIZE_MB, MAX_IMAGES_PER_PRODUCT, MAX_REVIEW_PHOTOS } = require('../config/constants');
 const AppError = require('../utils/AppError');
 
 const UPLOAD_DIR = path.join(__dirname, '..', '..', 'uploads');
@@ -32,10 +32,19 @@ const productImagesUpload = multer({
   limits: { fileSize: MAX_IMAGE_SIZE_MB * 1024 * 1024, files: MAX_IMAGES_PER_PRODUCT },
 });
 
+const adminProductUpload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: MAX_LANDING_IMAGE_SIZE_MB * 1024 * 1024,
+    files: MAX_IMAGES_PER_PRODUCT + 1,
+  },
+});
+
 const reviewPhotosUpload = multer({
   storage,
   fileFilter,
   limits: { fileSize: MAX_IMAGE_SIZE_MB * 1024 * 1024, files: MAX_REVIEW_PHOTOS },
 });
 
-module.exports = { productImagesUpload, reviewPhotosUpload, UPLOAD_DIR };
+module.exports = { productImagesUpload, adminProductUpload, reviewPhotosUpload, UPLOAD_DIR };
