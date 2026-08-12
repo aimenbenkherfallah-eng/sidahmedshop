@@ -56,6 +56,7 @@ const productSchema = new mongoose.Schema(
     },
     landingPage: {
       enabled: { type: Boolean, default: false },
+      image: { type: String, default: '' },
       html: {
         type: String,
         default: '',

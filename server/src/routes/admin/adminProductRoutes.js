@@ -15,8 +15,24 @@ router.use(protect, adminOnly);
 
 router.get('/', getAdminProducts);
 router.get('/:id', getAdminProduct);
-router.post('/', productImagesUpload.array('images', 6), validate(adminProductSchema), createProduct);
-router.put('/:id', productImagesUpload.array('images', 6), validate(adminProductSchema), updateProduct);
+router.post(
+  '/',
+  productImagesUpload.fields([
+    { name: 'images', maxCount: 6 },
+    { name: 'landingImage', maxCount: 1 },
+  ]),
+  validate(adminProductSchema),
+  createProduct
+);
+router.put(
+  '/:id',
+  productImagesUpload.fields([
+    { name: 'images', maxCount: 6 },
+    { name: 'landingImage', maxCount: 1 },
+  ]),
+  validate(adminProductSchema),
+  updateProduct
+);
 router.delete('/:id', deleteProduct);
 
 module.exports = router;

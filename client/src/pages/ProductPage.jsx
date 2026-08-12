@@ -124,19 +124,32 @@ export default function ProductPage() {
   const showLanding =
     product.landingPage?.enabled === true &&
     settings?.landingPage?.enabled !== false &&
-    product.landingPage?.html?.trim().length > 0;
+    (product.landingPage?.image?.trim().length > 0 ||
+      product.landingPage?.html?.trim().length > 0);
+
+  const landingImage = showLanding && product.landingPage?.image?.trim()
+    ? product.landingPage.image.trim()
+    : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       {showLanding && (
         <section className="mb-10">
-          <iframe
-            title="landing-page"
-            sandbox="allow-scripts allow-forms allow-popups"
-            srcDoc={product.landingPage.html}
-            className="w-full rounded-2xl border border-slate-100 bg-white"
-            style={{ height: 850, border: 'none' }}
-          />
+          {landingImage ? (
+            <img
+              src={landingImage}
+              alt={displayTitle}
+              className="w-full rounded-2xl border border-slate-100 bg-white object-cover"
+            />
+          ) : (
+            <iframe
+              title="landing-page"
+              sandbox="allow-scripts allow-forms allow-popups"
+              srcDoc={product.landingPage.html}
+              className="w-full rounded-2xl border border-slate-100 bg-white"
+              style={{ height: 850, border: 'none' }}
+            />
+          )}
         </section>
       )}
 

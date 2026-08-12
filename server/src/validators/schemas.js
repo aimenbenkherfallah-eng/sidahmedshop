@@ -60,6 +60,7 @@ const adminProductSchema = z.object({
   imageUrls: z.string().optional().default(''),
   landingEnabled: z.coerce.boolean().optional().default(false),
   landingHtml: z.string().max(150000, 'Landing page HTML is too long (max 150KB)').optional().default(''),
+  landingImageUrl: z.string().max(1000).optional().default(''),
 });
 
 const adminSettingsSchema = z.object({

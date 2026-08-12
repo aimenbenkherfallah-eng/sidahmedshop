@@ -16,6 +16,7 @@ const EMPTY = {
   descriptionAr: '',
   imageUrls: '',
   landingEnabled: false,
+  landingImageUrl: '',
   landingHtml: '',
 };
 
@@ -28,6 +29,7 @@ export default function ProductFormPage() {
 
   const [form, setForm] = useState(EMPTY);
   const [files, setFiles] = useState([]);
+  const [landingFile, setLandingFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(editing);
 
@@ -49,6 +51,7 @@ export default function ProductFormPage() {
           descriptionAr: p.descriptionAr || '',
           imageUrls: (p.images || []).join('\n'),
           landingEnabled: p.landingPage?.enabled ?? false,
+          landingImageUrl: p.landingPage?.image || '',
           landingHtml: p.landingPage?.html || '',
         });
       })
@@ -67,6 +70,7 @@ export default function ProductFormPage() {
         fd.append(key, value === '' && key === 'discountedPrice' ? '' : String(value));
       });
       files.forEach((f) => fd.append('images', f));
+      if (landingFile) fd.append('landingImage', landingFile);
 
       if (editing) await api.put(`/api/admin/products/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       else await api.post('/api/admin/products', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -178,17 +182,62 @@ export default function ProductFormPage() {
             {t.admin.landingEnabled}
           </label>
           {form.landingEnabled && (
-            <div className="mt-3">
-              <label className="label">{t.admin.landingHtml}</label>
-              <textarea
-                value={form.landingHtml}
-                onChange={(e) => set('landingHtml', e.target.value)}
-                rows={12}
-                className="input resize-y font-mono text-xs"
-                dir="ltr"
-                placeholder="<div style='text-align:center'><h1>Mon offre spéciale</h1>...</div>"
-              />
-              <p className="mt-1 text-xs text-slate-500">{t.admin.landingHint}</p>
+            <div className="mt-4 space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="label">{t.admin.landingImage}</label>
+                  <div className="flex items-center gap-3">
+                    {(landingFile || form.landingImageUrl) && (
+                      <img
+                        src={landingFile ? URL.createObjectURL(landingFile) : form.landingImageUrl}
+                        alt=""
+                        className="h-16 w-16 rounded-lg object-cover"
+                      />
+                    )}
+                    <label className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-slate-300 text-2xl text-slate-400 hover:border-primary-400">
+                      +
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => setLandingFile(e.target.files?.[0] || null)}
+                      />
+                    </label>
+                    {landingFile && (
+                      <button type="button" onClick={() => setLandingFile(null)} className="text-xs font-bold text-red-500 hover:underline">
+                        ×
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <label className="label">{t.admin.landingImageUrl}</label>
+                  <input
+                    value={form.landingImageUrl}
+                    onChange={(e) => set('landingImageUrl', e.target.value)}
+                    className="input"
+                    dir="ltr"
+                    placeholder="https://..."
+                  />
+                  {landingFile && (
+                    <p className="mt-1 text-xs text-slate-500">L’image uploadée remplacera l’URL.</p>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-slate-500">🖼️ {t.admin.landingImageHint}</p>
+
+              <div>
+                <label className="label">{t.admin.landingHtml}</label>
+                <textarea
+                  value={form.landingHtml}
+                  onChange={(e) => set('landingHtml', e.target.value)}
+                  rows={8}
+                  className="input resize-y font-mono text-xs"
+                  dir="ltr"
+                  placeholder="<div>...</div>"
+                />
+                <p className="mt-1 text-xs text-slate-500">{t.admin.landingHint}</p>
+              </div>
             </div>
           )}
         </div>

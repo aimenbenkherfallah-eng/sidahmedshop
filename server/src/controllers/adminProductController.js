@@ -50,10 +50,16 @@ const parseImageUrls = (raw) =>
 
 const createProduct = async (req, res, next) => {
   try {
-    const files = req.files || [];
+    const all = req.files || {};
+    const files = all.images || [];
     const uploaded = files.map((f) => `/uploads/${f.filename}`);
     const urls = parseImageUrls(req.body.imageUrls);
     const images = uploaded.length ? uploaded : urls;
+
+    const landingFile = all.landingImage?.[0];
+    const landingImage = landingFile
+      ? `/uploads/${landingFile.filename}`
+      : (req.body.landingImageUrl || '').trim();
 
     const product = await Product.create({
       title: req.body.title,
@@ -68,6 +74,7 @@ const createProduct = async (req, res, next) => {
       images,
       landingPage: {
         enabled: req.body.landingEnabled !== false,
+        image: landingImage,
         html: req.body.landingHtml || '',
       },
     });
@@ -83,13 +90,19 @@ const updateProduct = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) return next(new AppError('Product not found.', 404));
 
-    const files = req.files || [];
+    const all = req.files || {};
+    const files = all.images || [];
     const uploaded = files.map((f) => `/uploads/${f.filename}`);
     const urls = parseImageUrls(req.body.imageUrls);
 
     let images = product.images;
     if (uploaded.length) images = uploaded;
     else if (urls.length) images = urls;
+
+    const landingFile = all.landingImage?.[0];
+    let landingImage = product.landingPage?.image || '';
+    if (landingFile) landingImage = `/uploads/${landingFile.filename}`;
+    else if ((req.body.landingImageUrl || '').trim()) landingImage = req.body.landingImageUrl.trim();
 
     const { title, titleAr, description, descriptionAr, category, price, discountedPrice, stock, active } = req.body;
 
@@ -105,6 +118,7 @@ const updateProduct = async (req, res, next) => {
     product.images = images;
     product.landingPage = {
       enabled: req.body.landingEnabled !== false,
+      image: landingImage,
       html: req.body.landingHtml || '',
     };
 
