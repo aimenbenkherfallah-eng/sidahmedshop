@@ -11,7 +11,7 @@ export default function ProductCard({ product }) {
   const discount = discountPercent(product.price, product.discountedPrice);
 
   return (
-    <article className="group card flex flex-col overflow-hidden border border-slate-100 transition duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+    <div className="group card flex flex-col overflow-hidden transition hover:shadow-card-hover">
       <Link to={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-slate-100">
         <img
           src={product.images?.[0]}
@@ -57,6 +57,6 @@ export default function ProductCard({ product }) {
           </Link>
         )}
       </div>
-    </article>
+    </div>
   );
 }

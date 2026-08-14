@@ -139,7 +139,7 @@ export default function ProductPage() {
             <img
               src={landingImage}
               alt={displayTitle}
-              className="mx-auto h-auto w-full rounded-lg border border-slate-100 bg-white object-contain shadow-card"
+              className="w-full rounded-2xl border border-slate-100 bg-white object-cover"
             />
           ) : (
             <iframe

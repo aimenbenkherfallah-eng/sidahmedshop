@@ -66,7 +66,7 @@ export default function Navbar() {
           {cartEnabled && (
             <button
               onClick={() => setCartOpen(true)}
-              className="relative rounded-lg bg-primary-600 p-2.5 text-white shadow-sm transition hover:bg-primary-700"
+              className="relative rounded-lg bg-primary-600 p-2.5 text-white hover:bg-primary-700"
               aria-label={t.nav.cart}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
