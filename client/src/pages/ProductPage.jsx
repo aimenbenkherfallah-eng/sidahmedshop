@@ -71,7 +71,7 @@ function MagnifierGallery({ images, title }) {
 export default function ProductPage() {
   const { slug } = useParams();
   const { t, lang } = useLanguage();
-  const { addToCart, showToast, settings } = useStore();
+  const { addToCart, settings, cartEnabled } = useStore();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -139,12 +139,12 @@ export default function ProductPage() {
             <img
               src={landingImage}
               alt={displayTitle}
-              className="w-full rounded-2xl border border-slate-100 bg-white object-cover"
+              className="mx-auto h-auto w-full rounded-lg border border-slate-100 bg-white object-contain shadow-card"
             />
           ) : (
             <iframe
               title="landing-page"
-              sandbox="allow-scripts allow-forms allow-popups"
+              sandbox=""
               srcDoc={product.landingPage.html}
               className="w-full rounded-2xl border border-slate-100 bg-white"
               style={{ height: 850, border: 'none' }}
@@ -198,13 +198,15 @@ export default function ProductPage() {
               <QuantitySelector value={quantity} max={Math.max(1, product.stock)} onChange={setQuantity} />
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                onClick={() => addToCart(product, quantity)}
-                disabled={product.stock === 0}
-                className="btn-primary"
-              >
-                🛒 {t.product.addToCart}
-              </button>
+              {cartEnabled && (
+                <button
+                  onClick={() => addToCart(product, quantity)}
+                  disabled={product.stock === 0}
+                  className="btn-primary"
+                >
+                  🛒 {t.product.addToCart}
+                </button>
+              )}
               <button
                 onClick={() => setShowOrderForm(true)}
                 disabled={product.stock === 0}

@@ -48,6 +48,13 @@ const parseImageUrls = (raw) =>
     .map((u) => u.trim())
     .filter(Boolean);
 
+const deleteLocalUpload = (url) => {
+  if (!url?.startsWith('/uploads/')) return;
+  const filename = url.replace(/^\/uploads\//, '');
+  if (!/^[a-zA-Z0-9-]+\.(jpe?g|png|webp|gif|avif)$/.test(filename)) return;
+  fs.unlink(path.join(__dirname, '..', '..', 'uploads', filename), () => {});
+};
+
 const createProduct = async (req, res, next) => {
   try {
     const all = req.files || {};
@@ -90,6 +97,9 @@ const updateProduct = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) return next(new AppError('Product not found.', 404));
 
+    const previousImages = [...(product.images || [])];
+    const previousLandingImage = product.landingPage?.image || '';
+
     const all = req.files || {};
     const files = all.images || [];
     const uploaded = files.map((f) => `/uploads/${f.filename}`);
@@ -102,7 +112,7 @@ const updateProduct = async (req, res, next) => {
     const landingFile = all.landingImage?.[0];
     let landingImage = product.landingPage?.image || '';
     if (landingFile) landingImage = `/uploads/${landingFile.filename}`;
-    else if ((req.body.landingImageUrl || '').trim()) landingImage = req.body.landingImageUrl.trim();
+    else landingImage = (req.body.landingImageUrl || '').trim();
 
     const { title, titleAr, description, descriptionAr, category, price, discountedPrice, stock, active } = req.body;
 
@@ -123,6 +133,13 @@ const updateProduct = async (req, res, next) => {
     };
 
     await product.save();
+
+    if (uploaded.length) {
+      for (const image of previousImages) deleteLocalUpload(image);
+    }
+    if (previousLandingImage && previousLandingImage !== landingImage) {
+      deleteLocalUpload(previousLandingImage);
+    }
     res.json({ success: true, product });
   } catch (err) {
     next(err);
@@ -134,13 +151,8 @@ const deleteProduct = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) return next(new AppError('Product not found.', 404));
 
-    for (const img of product.images || []) {
-      if (img.startsWith('/uploads/')) {
-        const filename = img.replace(/^\/uploads\//, '');
-        const full = path.join(__dirname, '..', '..', 'uploads', filename);
-        fs.unlink(full, () => {});
-      }
-    }
+    for (const img of product.images || []) deleteLocalUpload(img);
+    deleteLocalUpload(product.landingPage?.image);
 
     await product.deleteOne();
     res.json({ success: true, message: 'Product deleted.' });

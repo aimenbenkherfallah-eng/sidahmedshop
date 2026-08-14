@@ -31,6 +31,11 @@ const createOrder = async (req, res, next) => {
       );
     }
 
+    const settings = await Settings.getSingleton();
+    if (source === 'checkout' && settings.shoppingCart?.enabled === false) {
+      return next(new AppError('Shopping cart checkout is currently disabled.', 403));
+    }
+
     const ids = items.map((i) => i.productId);
     const products = await Product.find({ _id: { $in: ids }, active: true });
     if (products.length !== ids.length) {
@@ -62,7 +67,6 @@ const createOrder = async (req, res, next) => {
       subtotal += unitPrice * qty;
     }
 
-    const settings = await Settings.getSingleton();
     const feeMap = settings.shippingFees || new Map();
     const shippingFee = feeMap.get(String(wilaya)) ?? settings.defaultShippingFee ?? 0;
     const total = subtotal + shippingFee;

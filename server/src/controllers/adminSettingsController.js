@@ -7,6 +7,7 @@ const getSettings = async (_req, res, next) => {
     const doc = settings.toObject();
     if (doc.shippingFees) doc.shippingFees = Object.fromEntries(doc.shippingFees);
     if (!doc.landingPage) doc.landingPage = { enabled: true };
+    if (!doc.shoppingCart) doc.shoppingCart = { enabled: true };
     res.json({ success: true, settings: doc });
   } catch (err) {
     next(err);
@@ -41,12 +42,20 @@ const updateSettings = async (req, res, next) => {
           : settings.landingPage?.enabled ?? true,
       };
     }
+    if (data.shoppingCart) {
+      settings.shoppingCart = {
+        enabled: data.shoppingCart.enabled !== undefined
+          ? data.shoppingCart.enabled
+          : settings.shoppingCart?.enabled ?? true,
+      };
+    }
 
     await settings.save();
 
     const doc = settings.toObject();
     if (doc.shippingFees) doc.shippingFees = Object.fromEntries(doc.shippingFees);
     if (!doc.landingPage) doc.landingPage = { enabled: true };
+    if (!doc.shoppingCart) doc.shoppingCart = { enabled: true };
     res.json({ success: true, settings: doc });
   } catch (err) {
     next(err);

@@ -21,15 +21,19 @@ export function StoreProvider({ children }) {
   const [cartOpen, setCartOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
-  useEffect(() => {
+  const refreshSettings = useCallback(() =>
     api
       .get('/api/settings/public')
       .then((res) => {
         setSettings(res.data.settings);
         initPixels(res.data.settings);
+        return res.data.settings;
       })
-      .catch(() => {});
-  }, []);
+  , []);
+
+  useEffect(() => {
+    refreshSettings().catch(() => {});
+  }, [refreshSettings]);
 
   useEffect(() => {
     try {
@@ -38,6 +42,15 @@ export function StoreProvider({ children }) {
       /* ignore */
     }
   }, [cart]);
+
+  const settingsLoading = settings === null;
+  const cartEnabled = settings?.shoppingCart?.enabled !== false;
+
+  useEffect(() => {
+    if (!settings || cartEnabled) return;
+    setCart([]);
+    setCartOpen(false);
+  }, [settings, cartEnabled]);
 
   const showToast = useCallback((message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -53,6 +66,7 @@ export function StoreProvider({ children }) {
 
   const addToCart = useCallback(
     (product, quantity = 1) => {
+      if (!cartEnabled) return false;
       setCart((prev) => {
         const existing = prev.find((i) => i.productId === product._id);
         if (existing) {
@@ -78,8 +92,9 @@ export function StoreProvider({ children }) {
       trackAddToCart({ product, quantity });
       showToast(t.cart.itemAdded);
       setCartOpen(true);
+      return true;
     },
-    [showToast, t]
+    [cartEnabled, showToast, t]
   );
 
   const updateQuantity = useCallback((productId, quantity) => {
@@ -110,6 +125,8 @@ export function StoreProvider({ children }) {
     () => ({
       cart,
       settings,
+      settingsLoading,
+      cartEnabled,
       cartOpen,
       setCartOpen,
       toasts,
@@ -121,8 +138,9 @@ export function StoreProvider({ children }) {
       removeFromCart,
       clearCart,
       shippingFeeFor,
+      refreshSettings,
     }),
-    [cart, settings, cartOpen, toasts, showToast, cartCount, cartSubtotal, addToCart, updateQuantity, removeFromCart, clearCart, shippingFeeFor]
+    [cart, settings, settingsLoading, cartEnabled, cartOpen, toasts, showToast, cartCount, cartSubtotal, addToCart, updateQuantity, removeFromCart, clearCart, shippingFeeFor, refreshSettings]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

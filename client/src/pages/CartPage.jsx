@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useStore } from '../context/StoreContext.jsx';
 import { formatPrice } from '../utils/format.js';
@@ -6,7 +6,13 @@ import QuantitySelector from '../components/product/QuantitySelector.jsx';
 
 export default function CartPage() {
   const { t, lang } = useLanguage();
-  const { cart, cartSubtotal, updateQuantity, removeFromCart } = useStore();
+  const { cart, cartSubtotal, updateQuantity, removeFromCart, cartEnabled, settingsLoading } = useStore();
+
+  if (settingsLoading) {
+    return <div className="mx-auto max-w-7xl px-4 py-24 text-center text-slate-400">{t.common.loading}</div>;
+  }
+
+  if (!cartEnabled) return <Navigate to="/shop" replace />;
 
   if (cart.length === 0) {
     return (

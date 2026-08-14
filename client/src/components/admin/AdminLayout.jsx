@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -51,13 +51,6 @@ export default function AdminLayout() {
         <div className="border-t border-slate-100 p-2">
           <div className="hidden px-3 py-1 text-xs text-slate-400 lg:block">{user?.username}</div>
           <button
-            onClick={toggleLang}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-primary-600 hover:bg-primary-50"
-          >
-            <span className="text-lg">🌐</span>
-            <span className="hidden lg:inline">{lang === 'ar' ? 'Français' : 'العربية'}</span>
-          </button>
-          <button
             onClick={onLogout}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50"
           >
@@ -67,6 +60,24 @@ export default function AdminLayout() {
         </div>
       </aside>
       <main className="flex-1 ps-16 lg:ps-60">
+        <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur lg:px-8">
+          <div>
+            <p className="text-sm font-extrabold text-slate-800">{t.admin.workspace}</p>
+            <p className="text-xs text-slate-500">{user?.username}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleLang}
+              className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold text-primary-700 transition hover:bg-primary-50"
+            >
+              {lang === 'ar' ? 'FR' : 'ع'}
+            </button>
+            <Link to="/shop" className="btn-outline !px-3 !py-2 text-sm">
+              {t.admin.storefront}
+            </Link>
+          </div>
+        </header>
         <div className="mx-auto max-w-6xl p-4 lg:p-8">
           <Outlet />
         </div>

@@ -19,6 +19,7 @@ const { generalApiLimiter } = require('./middleware/rateLimiter');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
+const isProduction = process.env.NODE_ENV === 'production';
 
 app.set('trust proxy', 1);
 
@@ -30,7 +31,6 @@ app.use(
         scriptSrc: [
           "'self'",
           "'unsafe-inline'",
-          "'unsafe-eval'",
           'https://connect.facebook.net',
           'https://analytics.tiktok.com',
           'https://challenges.cloudflare.com',
@@ -39,8 +39,8 @@ app.use(
         ],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:', 'blob:', 'https:', 'http:'],
-        connectSrc: ["'self'", 'https:', 'http:'],
+        imgSrc: ["'self'", 'data:', 'blob:', 'https:', ...(isProduction ? [] : ['http:'])],
+        connectSrc: ["'self'", 'https:', ...(isProduction ? [] : ['http:'])],
         frameSrc: ["'self'", 'https://challenges.cloudflare.com'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
@@ -64,7 +64,18 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 app.use(cookieParser());
 app.use(mongoSanitize());
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), { maxAge: '7d' }));
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, '..', 'uploads'), {
+    maxAge: '7d',
+    dotfiles: 'deny',
+    fallthrough: false,
+    setHeaders: (res) => {
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Content-Disposition', 'inline');
+    },
+  })
+);
 
 app.get('/api/health', (_req, res) => res.json({ success: true, status: 'ok', time: Date.now() }));
 

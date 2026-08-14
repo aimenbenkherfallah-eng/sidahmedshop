@@ -4,7 +4,7 @@ import { useStore } from '../../context/StoreContext.jsx';
 
 export default function Footer() {
   const { t, lang } = useLanguage();
-  const { settings } = useStore();
+  const { settings, cartEnabled } = useStore();
   const year = new Date().getFullYear();
 
   return (
@@ -21,7 +21,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm">
             <li><Link to="/" className="hover:text-white">{t.nav.home}</Link></li>
             <li><Link to="/shop" className="hover:text-white">{t.nav.shop}</Link></li>
-            <li><Link to="/cart" className="hover:text-white">{t.nav.cart}</Link></li>
+            {cartEnabled && <li><Link to="/cart" className="hover:text-white">{t.nav.cart}</Link></li>}
             <li><Link to="/admin/login" className="hover:text-white">{t.nav.admin}</Link></li>
           </ul>
         </div>

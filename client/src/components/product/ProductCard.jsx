@@ -6,12 +6,12 @@ import StarRating from './StarRating.jsx';
 
 export default function ProductCard({ product }) {
   const { t, lang } = useLanguage();
-  const { addToCart } = useStore();
+  const { addToCart, cartEnabled } = useStore();
   const price = product.discountedPrice ?? product.price;
   const discount = discountPercent(product.price, product.discountedPrice);
 
   return (
-    <div className="group card flex flex-col overflow-hidden transition hover:shadow-card-hover">
+    <article className="group card flex flex-col overflow-hidden border border-slate-100 transition duration-300 hover:-translate-y-1 hover:shadow-card-hover">
       <Link to={`/product/${product.slug}`} className="relative block aspect-square overflow-hidden bg-slate-100">
         <img
           src={product.images?.[0]}
@@ -43,14 +43,20 @@ export default function ProductCard({ product }) {
             <span className="text-xs font-bold text-slate-400 line-through">{formatPrice(product.price)}</span>
           )}
         </div>
-        <button
-          onClick={() => addToCart(product)}
-          disabled={product.stock === 0}
-          className="btn-primary mt-3 w-full !py-2 text-sm"
-        >
-          {t.product.addToCart}
-        </button>
+        {cartEnabled ? (
+          <button
+            onClick={() => addToCart(product)}
+            disabled={product.stock === 0}
+            className="btn-primary mt-3 w-full !py-2 text-sm"
+          >
+            {t.product.addToCart}
+          </button>
+        ) : (
+          <Link to={`/product/${product.slug}`} className="btn-outline mt-3 w-full !py-2 text-sm">
+            {t.product.viewProduct}
+          </Link>
+        )}
       </div>
-    </div>
+    </article>
   );
 }

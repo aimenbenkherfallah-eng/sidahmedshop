@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useStore } from '../context/StoreContext.jsx';
 import { formatPrice } from '../utils/format.js';
@@ -8,7 +8,7 @@ import { PROVINCES } from '../utils/provinces.js';
 
 export default function CheckoutPage() {
   const { t, lang } = useLanguage();
-  const { cart, shippingFeeFor } = useStore();
+  const { cart, shippingFeeFor, cartEnabled, settingsLoading } = useStore();
   const [wilayaPreview, setWilayaPreview] = useState('');
 
   const products = useMemo(
@@ -25,6 +25,12 @@ export default function CheckoutPage() {
   );
 
   const items = useMemo(() => cart.map((item) => ({ productId: item.productId, quantity: item.quantity })), [cart]);
+
+  if (settingsLoading) {
+    return <div className="mx-auto max-w-7xl px-4 py-24 text-center text-slate-400">{t.common.loading}</div>;
+  }
+
+  if (!cartEnabled) return <Navigate to="/shop" replace />;
 
   if (cart.length === 0) {
     return (

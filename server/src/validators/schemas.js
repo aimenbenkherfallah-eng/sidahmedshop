@@ -1,6 +1,23 @@
 const { z } = require('zod');
 const { PROVINCE_CODES } = require('../config/constants');
 
+const formBoolean = z.preprocess((value) => {
+  if (typeof value === 'boolean') return value;
+  if (value === 'true' || value === '1') return true;
+  if (value === 'false' || value === '0' || value === '') return false;
+  return value;
+}, z.boolean());
+
+const safeImageUrl = (value) => {
+  if (!value) return true;
+  if (/^\/uploads\/[a-zA-Z0-9-]+\.(jpe?g|png|webp|gif|avif)$/.test(value)) return true;
+  try {
+    return ['http:', 'https:'].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
+};
+
 const orderItemSchema = z.object({
   productId: z.string().regex(/^[a-f\d]{24}$/i, 'Invalid product id'),
   quantity: z.number().int().min(1).max(99),
@@ -31,6 +48,14 @@ const orderSchema = z.object({
     (v) => (typeof v === 'string' ? v : ''),
     z.string().max(4096).default('')
   ),
+}).superRefine((order, ctx) => {
+  if (order.source === 'express' && order.items.length !== 1) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['items'],
+      message: 'Express orders must contain exactly one product',
+    });
+  }
 });
 
 const reviewSchema = z.object({
@@ -56,11 +81,14 @@ const adminProductSchema = z.object({
     z.number().min(0).max(1e9).nullable()
   ),
   stock: z.coerce.number().int().min(0).max(1e6),
-  active: z.coerce.boolean().optional().default(true),
-  imageUrls: z.string().optional().default(''),
-  landingEnabled: z.coerce.boolean().optional().default(false),
+  active: formBoolean.optional().default(true),
+  imageUrls: z.string().max(7000).refine(
+    (value) => String(value || '').split(/[\n,]/).map((url) => url.trim()).filter(Boolean).every(safeImageUrl),
+    'Image URLs must use http or https'
+  ).optional().default(''),
+  landingEnabled: formBoolean.optional().default(false),
   landingHtml: z.string().max(150000, 'Landing page HTML is too long (max 150KB)').optional().default(''),
-  landingImageUrl: z.string().max(1000).optional().default(''),
+  landingImageUrl: z.string().max(1000).refine(safeImageUrl, 'Landing image URL must use http or https').optional().default(''),
 });
 
 const adminSettingsSchema = z.object({
@@ -85,6 +113,7 @@ const adminSettingsSchema = z.object({
   defaultShippingFee: z.coerce.number().min(0).max(50000).optional(),
   shippingFees: z.record(z.coerce.number().min(0).max(50000)).optional(),
   landingPage: z.object({ enabled: z.boolean().optional() }).optional(),
+  shoppingCart: z.object({ enabled: z.boolean().optional() }).optional(),
 });
 
 module.exports = {

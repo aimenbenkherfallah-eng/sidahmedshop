@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { protect, adminOnly } = require('../../middleware/auth');
 const { validate } = require('../../middleware/validate');
-const { adminProductUpload } = require('../../middleware/upload');
+const { adminProductUpload, validateUploadedImages } = require('../../middleware/upload');
 const { adminProductSchema } = require('../../validators/schemas');
 const {
   getAdminProducts,
@@ -21,6 +21,7 @@ router.post(
     { name: 'images', maxCount: 6 },
     { name: 'landingImage', maxCount: 1 },
   ]),
+  validateUploadedImages,
   validate(adminProductSchema),
   createProduct
 );
@@ -30,6 +31,7 @@ router.put(
     { name: 'images', maxCount: 6 },
     { name: 'landingImage', maxCount: 1 },
   ]),
+  validateUploadedImages,
   validate(adminProductSchema),
   updateProduct
 );

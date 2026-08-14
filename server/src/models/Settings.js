@@ -31,6 +31,9 @@ const settingsSchema = new mongoose.Schema(
     landingPage: {
       enabled: { type: Boolean, default: true },
     },
+    shoppingCart: {
+      enabled: { type: Boolean, default: true },
+    },
     defaultShippingFee: { type: Number, default: 600, min: 0, max: 50000 },
     shippingFees: {
       type: Map,

@@ -6,9 +6,9 @@ import QuantitySelector from '../product/QuantitySelector.jsx';
 
 export default function CartDrawer() {
   const { t } = useLanguage();
-  const { cart, cartOpen, setCartOpen, cartSubtotal, updateQuantity, removeFromCart } = useStore();
+  const { cart, cartOpen, setCartOpen, cartSubtotal, updateQuantity, removeFromCart, cartEnabled } = useStore();
 
-  if (!cartOpen) return null;
+  if (!cartEnabled || !cartOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50">

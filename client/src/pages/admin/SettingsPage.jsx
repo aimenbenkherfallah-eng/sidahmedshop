@@ -6,7 +6,7 @@ import { PROVINCES } from '../../utils/provinces.js';
 
 export default function SettingsPage() {
   const { t } = useLanguage();
-  const { showToast } = useStore();
+  const { showToast, refreshSettings } = useStore();
   const [settings, setSettings] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -47,6 +47,7 @@ export default function SettingsPage() {
     try {
       const res = await api.put('/api/admin/settings', settings);
       setSettings(res.data.settings);
+      await refreshSettings();
       showToast(t.admin.saved);
     } catch (err) {
       showToast(err.message, 'error');
@@ -93,6 +94,20 @@ export default function SettingsPage() {
             />
             {t.admin.landingFeatureEnabled}
           </label>
+        </section>
+
+        <section className="card space-y-4 p-6">
+          <h2 className="font-extrabold text-slate-800">🛒 {t.admin.cartFeature}</h2>
+          <label className="flex items-center gap-2 text-sm font-bold text-slate-700">
+            <input
+              type="checkbox"
+              checked={settings.shoppingCart?.enabled !== false}
+              onChange={(e) => set('shoppingCart.enabled', e.target.checked)}
+              className="h-5 w-5 accent-primary-600"
+            />
+            {t.admin.cartFeatureEnabled}
+          </label>
+          <p className="text-xs leading-relaxed text-slate-500">{t.admin.cartFeatureHint}</p>
         </section>
 
         <section className="card space-y-4 p-6">

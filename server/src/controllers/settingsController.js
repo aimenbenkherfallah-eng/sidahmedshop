@@ -3,6 +3,9 @@ const Settings = require('../models/Settings');
 const getPublicSettings = async (_req, res, next) => {
   try {
     const settings = await Settings.getSingleton();
+    const shippingFees = settings.shippingFees
+      ? Object.fromEntries(settings.shippingFees)
+      : {};
     res.json({
       success: true,
       settings: {
@@ -12,7 +15,9 @@ const getPublicSettings = async (_req, res, next) => {
         metaPixelId: settings.metaPixelId,
         tiktokPixelId: settings.tiktokPixelId,
         defaultShippingFee: settings.defaultShippingFee,
+        shippingFees,
         landingPage: settings.landingPage || { enabled: true },
+        shoppingCart: settings.shoppingCart || { enabled: true },
       },
     });
   } catch (err) {

@@ -30,38 +30,36 @@ export default function HomePage() {
   }, []);
 
   const hero = settings?.hero || {};
+  const heroProduct = trending[0];
+  const heroImage = heroProduct?.images?.[0];
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 text-white">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-14 lg:grid-cols-2 lg:py-20">
-          <div className="animate-fadeIn">
+      <section className="relative min-h-[480px] overflow-hidden bg-slate-900 text-white sm:min-h-[540px]">
+        {heroImage && (
+          <img
+            src={heroImage}
+            alt={heroProduct.title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+        <div className="absolute inset-0 bg-slate-950/65" />
+        <div className="relative mx-auto flex min-h-[480px] max-w-7xl items-center px-4 py-14 sm:min-h-[540px]">
+          <div className="max-w-2xl animate-fadeIn">
             <span className="badge mb-4 bg-accent-500 text-white">{t.home.heroBadge} 💵</span>
-            <h1 className="text-3xl font-extrabold leading-tight sm:text-5xl">
+            <h1 className="text-3xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
               {lang === 'ar' ? hero.titleAr : hero.titleFr}
             </h1>
-            <p className="mt-4 max-w-lg text-base text-primary-100 sm:text-lg">
+            <p className="mt-4 max-w-xl text-base text-slate-200 sm:text-lg">
               {lang === 'ar' ? hero.subtitleAr : hero.subtitleFr}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/shop" className="btn-accent !px-8 !py-3.5 !text-base">
                 {t.home.heroCta}
               </Link>
-              <Link to="/shop" className="rounded-xl border-2 border-white/40 px-8 py-3.5 text-base font-bold text-white transition hover:bg-white/10">
+              <Link to="/shop" className="rounded-lg border border-white/60 bg-white/10 px-8 py-3.5 text-base font-bold text-white transition hover:bg-white/20">
                 {t.home.heroCta2}
               </Link>
-            </div>
-          </div>
-          <div className="hidden justify-center lg:flex">
-            <div className="relative">
-              <div className="h-80 w-80 rounded-3xl bg-white/10 backdrop-blur" />
-              <div className="absolute inset-6 flex items-center justify-center rounded-3xl bg-white p-8 shadow-2xl">
-                <div className="text-center">
-                  <span className="text-7xl">🛍️</span>
-                  <p className="mt-4 text-2xl font-extrabold text-primary-800">Sidahmed Shop</p>
-                  <p className="text-sm font-bold text-accent-600">الدفع عند الاستلام 🚚</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -70,7 +68,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4">
         <div className="grid grid-cols-2 gap-3 -mt-8 sm:grid-cols-4">
           {TRUST_ITEMS.map((item) => (
-            <div key={item.key} className="card flex flex-col items-center gap-2 p-4 text-center">
+            <div key={item.key} className="card flex flex-col items-center gap-2 border border-slate-100 p-4 text-center">
               <span className="text-3xl">{item.icon}</span>
               <p className="text-sm font-extrabold text-slate-800">{t.home[`${item.key}Title`]}</p>
               <p className="text-xs text-slate-500">{t.home[`${item.key}Desc`]}</p>

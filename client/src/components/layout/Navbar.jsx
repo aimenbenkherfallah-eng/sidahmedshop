@@ -5,7 +5,7 @@ import { useStore } from '../../context/StoreContext.jsx';
 
 export default function Navbar() {
   const { t, lang, toggleLang } = useLanguage();
-  const { cartCount, setCartOpen, settings } = useStore();
+  const { cartCount, setCartOpen, settings, cartEnabled } = useStore();
   const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
@@ -63,20 +63,22 @@ export default function Navbar() {
           >
             {lang === 'ar' ? 'FR' : 'ع'}
           </button>
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative rounded-lg bg-primary-600 p-2.5 text-white hover:bg-primary-700"
-            aria-label={t.nav.cart}
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 5h14M9 21h.01M19 21h.01" />
-            </svg>
-            {cartCount > 0 && (
-              <span className="absolute -end-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-xs font-black text-white">
-                {cartCount}
-              </span>
-            )}
-          </button>
+          {cartEnabled && (
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative rounded-lg bg-primary-600 p-2.5 text-white shadow-sm transition hover:bg-primary-700"
+              aria-label={t.nav.cart}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 5h14M9 21h.01M19 21h.01" />
+              </svg>
+              {cartCount > 0 && (
+                <span className="absolute -end-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1 text-xs font-black text-white">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          )}
         </nav>
       </div>
 

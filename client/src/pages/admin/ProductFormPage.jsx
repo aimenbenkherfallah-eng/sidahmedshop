@@ -72,8 +72,8 @@ export default function ProductFormPage() {
       files.forEach((f) => fd.append('images', f));
       if (landingFile) fd.append('landingImage', landingFile);
 
-      if (editing) await api.put(`/api/admin/products/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      else await api.post('/api/admin/products', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      if (editing) await api.put(`/api/admin/products/${id}`, fd);
+      else await api.post('/api/admin/products', fd);
 
       showToast(t.admin.saved);
       navigate('/admin/products');

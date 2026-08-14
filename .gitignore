@@ -13,6 +13,7 @@ server/uploads/*.jpeg
 server/uploads/*.png
 server/uploads/*.webp
 server/uploads/*.gif
+server/uploads/*.avif
 !server/uploads/.gitkeep
 
 # Logs
