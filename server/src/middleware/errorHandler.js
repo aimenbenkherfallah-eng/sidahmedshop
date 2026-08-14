@@ -4,9 +4,7 @@ const notFound = (req, _res, next) => {
   next(new AppError(`Route not found: ${req.method} ${req.originalUrl}`, 404));
 };
 
-const fs = require('fs');
-
-const errorHandler = (err, req, res, _next) => {
+const errorHandler = (err, _req, res, _next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal server error';
   let details = err.details;
@@ -42,13 +40,6 @@ const errorHandler = (err, req, res, _next) => {
 
   if (!err.isOperational) {
     console.error('[ERROR]', err);
-  }
-
-  const uploadedFiles = Array.isArray(req.files)
-    ? req.files
-    : Object.values(req.files || {}).flat();
-  for (const file of uploadedFiles) {
-    if (file?.path) fs.unlink(file.path, () => {});
   }
 
   res.status(statusCode).json({

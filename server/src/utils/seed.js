@@ -124,7 +124,11 @@ const sampleProducts = [
 
 const seedAdmin = async () => {
   const username = (process.env.ADMIN_USERNAME || 'sidahmed').toLowerCase();
-  const password = process.env.ADMIN_PASSWORD || 'slhgta62004';
+  const password = process.env.ADMIN_PASSWORD || '';
+
+  if (password.length < 12) {
+    throw new Error('ADMIN_PASSWORD must contain at least 12 characters before running the seed.');
+  }
 
   const existing = await User.findOne({ username });
   if (existing) {

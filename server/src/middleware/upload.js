@@ -1,7 +1,4 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const crypto = require('crypto');
 const { MAX_IMAGE_SIZE_MB, MAX_LANDING_IMAGE_SIZE_MB, MAX_IMAGES_PER_PRODUCT, MAX_REVIEW_PHOTOS } = require('../config/constants');
 const AppError = require('../utils/AppError');
 
@@ -13,19 +10,7 @@ const IMAGE_EXTENSIONS = {
   'image/avif': '.avif',
 };
 
-const UPLOAD_DIR = path.join(__dirname, '..', '..', 'uploads');
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-  filename: (_req, file, cb) => {
-    const ext = IMAGE_EXTENSIONS[file.mimetype];
-    const name = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`;
-    cb(null, name);
-  },
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (_req, file, cb) => {
   if (!IMAGE_EXTENSIONS[file.mimetype]) {
@@ -35,7 +20,7 @@ const fileFilter = (_req, file, cb) => {
 };
 
 const hasValidSignature = (file) => {
-  const bytes = fs.readFileSync(file.path).subarray(0, 16);
+  const bytes = file.buffer.subarray(0, 16);
   if (file.mimetype === 'image/jpeg') return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
   if (file.mimetype === 'image/png') return bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
   if (file.mimetype === 'image/gif') return bytes.subarray(0, 6).toString('ascii') === 'GIF87a' || bytes.subarray(0, 6).toString('ascii') === 'GIF89a';
@@ -49,13 +34,20 @@ const validateUploadedImages = (req, _res, next) => {
     ? req.files
     : Object.values(req.files || {}).flat();
   const invalid = files.find((file) => !hasValidSignature(file));
-  if (!invalid) return next();
-
-  for (const file of files) {
-    if (file?.path) fs.unlink(file.path, () => {});
+  if (invalid) {
+    req.files = {};
+    return next(new AppError('Invalid or corrupted image file.', 400));
   }
-  req.files = {};
-  return next(new AppError('Invalid or corrupted image file.', 400));
+
+  const oversizedProductImage = files.find(
+    (file) => file.fieldname !== 'landingImage' && file.size > MAX_IMAGE_SIZE_MB * 1024 * 1024
+  );
+  if (oversizedProductImage) {
+    req.files = {};
+    return next(new AppError(`Product and review images must not exceed ${MAX_IMAGE_SIZE_MB} MB.`, 400));
+  }
+
+  return next();
 };
 
 const productImagesUpload = multer({
@@ -84,5 +76,4 @@ module.exports = {
   adminProductUpload,
   reviewPhotosUpload,
   validateUploadedImages,
-  UPLOAD_DIR,
 };
